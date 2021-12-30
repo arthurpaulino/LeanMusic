@@ -28,7 +28,7 @@ namespace Scale
 def toNotes (s : Scale) : List Note :=
   s.shape.intervals.toNotes s.base
 
-theorem toNotesNotEmpty (s : Scale) : s.toNotes ≠ Note.emptyNotes :=
+theorem toNotesNotEmpty (s : Scale) : s.toNotes ≠ Notes.emptyNotes :=
   by simp [Intervals.toNotes, toNotes]
 
 end Scale

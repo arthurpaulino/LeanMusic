@@ -7,7 +7,7 @@
 /-- Notes can't be simple integers because operations between notes aren't trivially typed. -/
 structure Note where
   val : Int := 0 -- standard C
-  deriving Inhabited, DecidableEq
+  deriving DecidableEq
 
 namespace Note
 
@@ -43,6 +43,51 @@ def plusOctave (n : Note) : Note :=
 def minusOctave (n : Note) : Note :=
   n.plusInterval (-12)
 
-@[simp] def emptyNotes : List Note := []
-
 end Note
+
+abbrev Notes := List Note
+
+namespace Notes
+
+@[simp] def emptyNotes : Notes := []
+
+-- Transformations
+
+def shiftedOf : Notes → Int → Notes
+  | h::t, of => [⟨h.val + of⟩] ++ shiftedOf t of
+  | _,    _  => []
+
+def invertedAt : Notes → Note → Notes
+  | h::t, a => t ++ [⟨a.val + h.val⟩]
+  | _, _    => []
+
+def invertedAtN : Notes → Note → Nat → Notes
+  | l, _, Nat.zero    => l
+  | l, a, Nat.succ n' => (l.invertedAt a).invertedAtN a n'
+
+-- Comparisons
+
+def isEquiv (l l' : Notes) : Prop :=
+  ∃ (of : Int), l.shiftedOf of = l'
+
+def isEquivIfInverted (l l' : Notes) (a : Note) : Prop :=
+  l.isEquiv l' ∧ ∃ (n : Nat), l.invertedAtN a n = l'
+
+-- Proofs
+
+theorem sameLengthOfShifted (l : Notes) (of : Int) :
+    l.length = (l.shiftedOf of).length := by
+  induction l with
+    | nil         => rfl
+    | cons _ _ hi => simp [hi] rfl
+
+theorem sameLengthOfInverted (l : Notes) (n : Note) :
+    l.length = (l.invertedAt n).length := by
+  cases l with
+    | nil      => rfl
+    | cons _ _ => simp [invertedAt]
+
+theorem shiftOfHeadAndTail (h : Note) (of : Int) (t : Notes) :
+    shiftedOf (h::t) of = (⟨h.val + of⟩)::(shiftedOf t of) := rfl
+
+end Notes
