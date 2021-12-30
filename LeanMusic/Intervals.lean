@@ -9,69 +9,91 @@ import LeanMusic.Notes
 /-- Semi-*int*ervals are represented with the type `Int` (happy coincidence). -/
 abbrev Intervals := List Int
 
-def Intervals.grows : Intervals → Prop
-  | h::h'::t => h < h' ∧ grows t
+namespace Intervals
+
+def tail (l : Intervals) : Intervals :=
+  l.tailD []
+
+-- Characterizations
+
+def ascending : Intervals → Prop
+  | h::h'::t => h < h' ∧ ascending t
   | _        => True
 
-def Intervals.maxRelativeInterval (l : Intervals) (h : l.grows := by simp) : Int :=
-  l.getLastD 0 - l.headD 0
+def startsPositive : Intervals → Prop
+  | h::_ => h > 0
+  | _    => True
 
-def Intervals.shiftOf (l : Intervals) (of : Int) : Intervals :=
-  l.map fun i => i + of
+def max (l : Intervals) (h : l.ascending := by simp) : Int :=
+  l.getLastD 0
 
-def Intervals.invertAt : Intervals → Int → Intervals
+-- Transformations
+
+def shiftOf : Intervals → Int → Intervals
+  | h::t, of => [h + of] ++ shiftOf t of
+  | _,    _  => []
+
+def invertAt : Intervals → Int → Intervals
   | h::t, a => t ++ [a - h]
   | _, _    => []
 
-def Intervals.invertAtN : Intervals → Int → Nat → Intervals
+def invertAtN : Intervals → Int → Nat → Intervals
   | l, _, Nat.zero    => l
   | l, a, Nat.succ n' => (l.invertAt a).invertAtN a n'
 
-theorem Intervals.sameLengthOfShifted (l : Intervals) :
-    ∀ (of : Int), l.length = (l.shiftOf of).length :=
-  fun _ => by induction l with
+-- Comparisons
+
+def isEquiv (l l' : Intervals) : Prop :=
+  ∃ (of : Int), l.shiftOf of = l'
+
+def isEquivIfInverted (l l' : Intervals) (a : Int) : Prop :=
+  l.isEquiv l' ∧ ∃ (n : Nat), l.invertAtN a n = l'
+
+-- Proofs
+
+theorem sameLengthOfShifted (l : Intervals) (of : Int) :
+    l.length = (l.shiftOf of).length := by
+  induction l with
     | nil         => rfl
     | cons _ _ hi => simp [List.length, hi] rfl
 
-theorem Intervals.sameLengthOfInverted (l : Intervals) :
-    ∀ (a : Int), l.length = (l.invertAt a).length :=
-  fun _ => by cases l with
+theorem sameLengthOfInverted (l : Intervals) (a : Int) :
+    l.length = (l.invertAt a).length := by
+  cases l with
     | nil      => rfl
-    | cons h t => simp [invertAt]
+    | cons _ _ => simp [invertAt]
 
-theorem Intervals.sameLengthOfInvertedN (l : Intervals) :
-    ∀ (n : Nat), ∀ (a : Int), l.length = (l.invertAtN a n).length :=
-  fun n a => by cases l with
-    | nil      => sorry
-    | cons h t => sorry
+theorem ascendingTailOfAscending (l : Intervals) (ha : l.ascending) :
+    l.tail.ascending := by
+  induction l with
+  | nil => simp [ascending]
+  | cons h t hi => sorry
 
--- TODO
--- prove correctness of `Intervals.grow` (and consequently of `Intervals.maxRelativeInterval`)
--- prove that shifting doesn't change the result of `Intervals.maxRelativeInterval`
--- prove that inverting keeps the result of `Intervals.maxRelativeInterval` bounded
--- prove that if l grows then l shifted grows too
--- prove that if l grows then l inverted grows too as long as `of` is big enough
+theorem shiftOfHeadAndTail (h of : Int) (t : Intervals) :
+    shiftOf (h::t) of = (h + of)::(shiftOf t of) :=
+  by simp [shiftOf]
 
-def Note.intervalUntilNote (n n' : Note) : Int :=
-  n'.val - n.val
+theorem ascendingOfShiftedAux (l : Intervals) (of h : Int)
+    (ha : ascending (l.shiftOf of)) : ascending ((h + of)::(l.shiftOf of)) := by
+  induction l with
+  | nil => simp [ascending]
+  | cons h t hi => sorry
 
-def Note.intervalFromNote (n n' : Note) : Int :=
-  - n.intervalUntilNote n'
+theorem ascendingOfShifted (l : Intervals) (ha : l.ascending) (of : Int) :
+    (l.shiftOf of).ascending := by
+  induction l with
+    | nil => simp [ascending]
+    | cons h t hi =>
+      exact ascendingOfShiftedAux t of h $
+        hi (ascendingTailOfAscending (h::t) ha)
 
-def Note.plusInterval (n : Note) (i : Int) : Note :=
-  ⟨n.val + i⟩
-
-def Note.plusOctave (n : Note) : Note :=
-  n.plusInterval 12
-
-def Note.minusOctave (n : Note) : Note :=
-  n.plusInterval (-12)
-
-def Intervals.OfNotes (head : Note) (tail : List Note) : Intervals :=
+def ofNotes (head : Note) (tail : List Note) : Intervals :=
   tail.map fun n => n.intervalFromNote head
 
-def Intervals.toNotes (l : Intervals) (head : Note) : List Note :=
+def toNotes (l : Intervals) (head : Note) : List Note :=
   [head] ++ (l.map fun i => head.plusInterval i)
+
+end Intervals
 
 def minorTriadInterval : Intervals := [3, 7]
 def majorTriadInterval : Intervals := [4, 7]

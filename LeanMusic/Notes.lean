@@ -9,25 +9,40 @@ structure Note where
   val : Int := 0 -- standard C
   deriving Inhabited, DecidableEq
 
-def Note.lt (n n' : Note) : Prop := n.val < n'.val
-def Note.le (n n' : Note) : Prop := n.val ≤ n'.val
+namespace Note
 
-instance : LT Note := ⟨Note.lt⟩
-instance : LE Note := ⟨Note.le⟩
+def lt (n n' : Note) : Prop := n.val < n'.val
+def le (n n' : Note) : Prop := n.val ≤ n'.val
 
-def Note.decLt (n n' : Note) : Decidable (n < n') :=
+instance : LT Note := ⟨lt⟩
+instance : LE Note := ⟨le⟩
+
+def decLt (n n' : Note) : Decidable (n < n') :=
   match n, n' with
   | ⟨p⟩, ⟨p'⟩ => inferInstanceAs (Decidable (p < p'))
 
-def Note.decLe (n n' : Note) : Decidable (n ≤ n') :=
+def decLe (n n' : Note) : Decidable (n ≤ n') :=
   match n, n' with
   | ⟨p⟩, ⟨p'⟩ => inferInstanceAs (Decidable (p ≤ p'))
 
-instance (n n' : Note) : Decidable (n < n') := Note.decLt n n'
-instance (n n' : Note) : Decidable (n ≤ n') := Note.decLe n n'
+instance (n n' : Note) : Decidable (n < n') := decLt n n'
+instance (n n' : Note) : Decidable (n ≤ n') := decLe n n'
 
-def Note.min (n n' : Note) : Note :=
-  if n ≤ n' then n else n'
+def intervalUntilNote (n n' : Note) : Int :=
+  n'.val - n.val
 
-def Note.max (n n' : Note) : Note :=
-  if n ≤ n' then n' else n
+def intervalFromNote (n n' : Note) : Int :=
+  - n.intervalUntilNote n'
+
+def plusInterval (n : Note) (i : Int) : Note :=
+  ⟨n.val + i⟩
+
+def plusOctave (n : Note) : Note :=
+  n.plusInterval 12
+
+def minusOctave (n : Note) : Note :=
+  n.plusInterval (-12)
+
+@[simp] def emptyNotes : List Note := []
+
+end Note

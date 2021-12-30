@@ -14,19 +14,21 @@ A scale shape is a list of intervals such that:
 * The maximal range of its relative intervals can't be greater than an octave
 -/
 structure ScaleShape where
-  intervals    : Intervals
-  properLength : intervals.length < 12 := by simp
-  grows        : intervals.grows := by simp
-  properRange  : intervals.maxRelativeInterval grows ≤ 12 := by simp
+  intervals      : Intervals
+  startsPositive : intervals.startsPositive := by simp
+  ascending      : intervals.ascending := by simp
+  properMax      : intervals.max ascending < 12 := by simp
 
 structure Scale where
   base  : Note
   shape : ScaleShape
 
-def Scale.toNotes (s : Scale) : List Note :=
+namespace Scale
+
+def toNotes (s : Scale) : List Note :=
   s.shape.intervals.toNotes s.base
 
-@[simp] def emptyNotes : List Note := []
-
-theorem Scale.toNotesNotEmpty (s : Scale) : s.toNotes ≠ emptyNotes :=
+theorem toNotesNotEmpty (s : Scale) : s.toNotes ≠ Note.emptyNotes :=
   by simp [Intervals.toNotes, toNotes]
+
+end Scale
