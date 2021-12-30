@@ -25,7 +25,7 @@ def Intervals.invertAt : Intervals → Int → Intervals
 
 def Intervals.invertAtN : Intervals → Int → Nat → Intervals
   | l, _, Nat.zero    => l
-  | l, a, Nat.succ n' => l.invertAtN a n'
+  | l, a, Nat.succ n' => (l.invertAt a).invertAtN a n'
 
 theorem Intervals.sameLengthOfShifted (l : Intervals) :
     ∀ (of : Int), l.length = (l.shiftOf of).length :=
@@ -40,7 +40,10 @@ theorem Intervals.sameLengthOfInverted (l : Intervals) :
     | cons h t => simp [invertAt]
 
 theorem Intervals.sameLengthOfInvertedN (l : Intervals) :
-    ∀ (n : Nat), (∀ (a : Int), l.length = (l.invertAtN a n).length) := sorry
+    ∀ (n : Nat), ∀ (a : Int), l.length = (l.invertAtN a n).length :=
+  fun n a => by cases l with
+    | nil      => sorry
+    | cons h t => sorry
 
 -- TODO
 -- prove correctness of `Intervals.grow` (and consequently of `Intervals.maxRelativeInterval`)
