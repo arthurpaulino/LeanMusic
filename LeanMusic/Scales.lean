@@ -20,15 +20,5 @@ structure ScaleShape where
   properMax      : intervals.max ascending < 12 := by simp
 
 structure Scale where
-  base  : Note
+  base  : Int
   shape : ScaleShape
-
-namespace Scale
-
-def toNotes (s : Scale) : List Note :=
-  s.shape.intervals.toNotes s.base
-
-theorem toNotesNotEmpty (s : Scale) : s.toNotes ≠ Notes.emptyNotes :=
-  by simp [Intervals.toNotes, toNotes]
-
-end Scale

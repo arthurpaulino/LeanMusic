@@ -4,7 +4,6 @@
   Authors: Arthur Paulino
 -/
 
-import LeanMusic.Notes
 import LeanMusic.Utils
 
 /-- Semi-*int*ervals are represented with the type `Int` (happy coincidence). -/
@@ -69,14 +68,6 @@ theorem ascendingOfShifted (l : Intervals) (ha : l.ascending) (of : Int) :
         | th::tt =>
           simp [shiftedOf] at ha hi
           simp [ascending, List.append, Int.ltOfPlus ha.1, hi ha.2]
-
--- Intervals ↔ Notes 
-
-def toNotes (l : Intervals) (head : Note) : Notes :=
-  [head] ++ (l.map fun i => head.plusInterval i)
-
-def ofNotes (head : Note) (tail : Notes) : Intervals :=
-  tail.map fun n => n.intervalFromNote head
 
 -- Known intervals
 

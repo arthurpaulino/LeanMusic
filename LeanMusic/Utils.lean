@@ -7,6 +7,4 @@
 theorem Int.ltOfPlus {a b c : Int} (h : a < b) : a + c < b + c := sorry
 
 theorem List.isEmptyIff {l : List α} : l.isEmpty ↔ l = [] := by
-  cases l with
-  | nil      => simp [isEmpty]
-  | cons _ _ => simp [isEmpty]
+  cases l with | _ => simp [isEmpty]
