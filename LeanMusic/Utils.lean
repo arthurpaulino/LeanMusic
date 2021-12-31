@@ -4,6 +4,8 @@
   Authors: Arthur Paulino
 -/
 
+theorem Int.ltOfPlus {a b c : Int} (h : a < b) : a + c < b + c := sorry
+
 theorem List.isEmptyIff {l : List α} : l.isEmpty ↔ l = [] := by
   cases l with
   | nil      => simp [isEmpty]
