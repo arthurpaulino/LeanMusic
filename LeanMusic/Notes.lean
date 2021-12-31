@@ -10,6 +10,17 @@ abbrev Notes := List Int
 
 namespace Notes
 
+-- Data extractions
+
+def tail (l : Notes) : Notes :=
+  l.tailD []
+
+def first (l : Notes) (hne : l ≠ []) : Int :=
+  l.head hne
+
+def last (l : Notes) (he : l ≠ []) : Int :=
+  l.getLast he
+
 -- Transformations
 
 def shiftedOf : Notes → Int → Notes
@@ -26,40 +37,48 @@ def invertedAtTimes : Notes → Int → Nat → Notes
 
 -- Properties
 
-def tail (l : Notes) : Notes :=
-  l.tailD []
-
 def ascending : Notes → Prop
   | h::h'::t => h < h' ∧ ascending (h'::t)
   | _        => True
 
+def isHighest (l : Notes) (n : Int) : Prop :=
+  l.contains n ∧ ∀ n', l.contains n' → n' ≤ n
+
+def isLowest (l : Notes) (n : Int) : Prop :=
+  l.contains n ∧ ∀ n', l.contains n' → n ≤ n'
+
+def isMaxInterval (l : Notes) (i : Int) : Prop :=
+  ∃ max min, i = max - min ∧ l.isHighest max ∧ l.isLowest min
+
 -- Comparisons
 
 def ofSameIntervals (l l' : Notes) : Prop :=
-  ∃ (i : Int), l.shiftedOf i = l'
+  ∃ i, l.shiftedOf i = l'
 
 def ofSameIntervalsIfInvertedAt (l l' : Notes) (a : Int) : Prop :=
-  l.ofSameIntervals l' ∧ ∃ (n : Nat), l.invertedAtTimes a n = l'
+  l.ofSameIntervals l' ∧ ∃ n, l.invertedAtTimes a n = l'
 
 -- Notes ↔ Intervals
 
 def toIntervals : ∀ (l : Notes), l ≠ [] → List Int
-  | [],            hn => absurd rfl hn
+  | [],           hne => absurd rfl hne
   | h::(t : Notes), _ => t.shiftedOf (-h)
 
 def ofIntervals : Int → List Int → Notes
   | h,          [] => [h]
-  | h, (l : Notes) => l.shiftedOf (h)
+  | h, (l : Notes) => l.shiftedOf h
 
 -- Proofs
 
-theorem sameLengthOfShifted (l : Notes) (of : Int) :
+variable (l : Notes)
+
+theorem sameLengthOfShifted (of : Int) :
     l.length = (l.shiftedOf of).length := by
   induction l with
     | nil         => rfl
     | cons _ _ hi => simp [hi] rfl
 
-theorem sameLengthOfInverted (l : Notes) (n : Int) :
+theorem sameLengthOfInverted (n : Int) :
     l.length = (l.invertedAt n).length := by
   cases l with
     | nil      => rfl
@@ -68,7 +87,7 @@ theorem sameLengthOfInverted (l : Notes) (n : Int) :
 theorem shiftOfHeadAndTail (h : Int) (of : Int) (t : Notes) :
     shiftedOf (h::t) of = (h + of)::(shiftedOf t of) := rfl
 
-theorem ascendingTailOfAscending (l : Notes) (ha : l.ascending) :
+theorem ascendingTailOfAscending (ha : l.ascending) :
     l.tail.ascending := by
   cases l with
     | cons _ t =>
@@ -77,7 +96,7 @@ theorem ascendingTailOfAscending (l : Notes) (ha : l.ascending) :
       | _::_ => simp only [tail, List.tailD, ha.2]
     | _ => simp [ascending]
 
-theorem ascendingOfShifted (l : Notes) (ha : l.ascending) (of : Int) :
+theorem ascendingOfShifted (ha : l.ascending) (of : Int) :
     (l.shiftedOf of).ascending := by
   induction l with
     | nil => simp [ascending]
@@ -87,5 +106,17 @@ theorem ascendingOfShifted (l : Notes) (ha : l.ascending) (of : Int) :
         | th::tt =>
           simp [shiftedOf] at ha hi
           simp [ascending, List.append, Int.ltOfPlus ha.1, hi ha.2]
+
+theorem firstIsLowestOfAscending (ha : l.ascending) (hne : l ≠ []) :
+    l.isLowest (l.first hne) := sorry
+
+theorem lastIsHighestOfAscending (ha : l.ascending) (hne : l ≠ []) :
+    l.isHighest (l.last hne) := sorry
+
+theorem lastMinusFirstIsMaxIntervalOfAscending (ha : l.ascending) (hne : l ≠ []) :
+    l.isMaxInterval (l.last hne - l.first hne) := by
+  exact ⟨last l hne, first l hne, rfl,
+    l.lastIsHighestOfAscending ha hne,
+    l.firstIsLowestOfAscending ha hne⟩
 
 end Notes
