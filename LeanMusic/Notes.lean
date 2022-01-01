@@ -108,7 +108,19 @@ theorem ascendingOfShifted (ha : l.ascending) (of : Int) :
           simp [ascending, List.append, Int.ltOfPlus ha.1, hi ha.2]
 
 theorem firstIsLowestOfAscending (ha : l.ascending) (hne : l ≠ []) :
-    l.isLowest (l.first hne) := sorry
+    l.isLowest (l.first hne) := by
+  have hat := l.ascendingTailOfAscending ha
+  cases l with
+    | nil => contradiction
+    | cons h t =>
+      simp [tail, List.tailD] at hat
+      simp [first, List.head, isLowest]
+      intro n hn
+      cases t with
+        | nil => simp [List.eqOfSingletonContains hn]
+        | cons z x =>
+          simp [ascending] at ha
+          sorry
 
 theorem lastIsHighestOfAscending (ha : l.ascending) (hne : l ≠ []) :
     l.isHighest (l.last hne) := sorry
