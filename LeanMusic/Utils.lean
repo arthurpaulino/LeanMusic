@@ -14,5 +14,7 @@ theorem Int.ltOfPlus {a b c : Int} (h : a < b) : a + c < b + c := sorry
 theorem List.eqOfSingletonContains [BEq α] :
     ([h] : List α).contains h' → h = h' := sorry
 
+theorem List.nonEmptyOfHeadAndTail : (h::t : List α) ≠ [] := by simp
+
 theorem List.isEmptyIff {l : List α} : l.isEmpty ↔ l = [] := by
   cases l with | _ => simp [isEmpty]
