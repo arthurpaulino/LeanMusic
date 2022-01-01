@@ -116,15 +116,15 @@ theorem firstIsLowestOfAscending (ha : l.ascending) (hne : l ≠ []) :
   cases l with
     | nil => contradiction
     | cons h t =>
-      simp [tail, List.tailD] at hat
       simp [first, List.head, isLowest]
-      intro n hn
+      intro _ hn
       induction t with
         | nil => simp [List.eqOfSingletonContains hn]
-        | cons z x hi =>
-          simp [ascending] at ha
-          have hahx := ascendingOfLtAndAscending ha
-          sorry
+        | cons h' t' hi =>
+          exact hi (ascendingOfLtAndAscending ha)
+            (List.nonEmptyOfHeadAndTail h t')
+            (ascendingTailOfAscending (h' :: t') hat)
+            (List.tailContainsOfNeqHead hn)
 
 theorem lastIsHighestOfAscending (ha : l.ascending) (hne : l ≠ []) :
     l.isHighest (l.last hne) := sorry
