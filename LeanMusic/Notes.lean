@@ -50,6 +50,9 @@ def isLowest (l : Notes) (n : Int) : Prop :=
 def isMaxInterval (l : Notes) (i : Int) : Prop :=
   ∃ max min, i = max - min ∧ l.isHighest max ∧ l.isLowest min
 
+def isMaxIntervalBound (l : Notes) (b : Int) : Prop :=
+  ∀ i, l.isMaxInterval i → i ≤ b
+
 -- Comparisons
 
 def ofSameIntervals (l l' : Notes) : Prop :=
@@ -134,5 +137,15 @@ theorem lastMinusFirstIsMaxIntervalOfAscending (ha : l.ascending) (hne : l ≠ [
   exact ⟨last l hne, first l hne, rfl,
     l.lastIsHighestOfAscending ha hne,
     l.firstIsLowestOfAscending ha hne⟩
+
+@[simp] theorem emptyIsAcending : ascending [] := by simp [ascending]
+
+@[simp] theorem singletonIsAcending : ascending [h] := by simp [ascending]
+
+@[simp] theorem singletonZeroMaxInterval (h : Int) : isMaxInterval [h] 0 := by
+  have qq : isHighest [h] h := sorry
+  have ww : isLowest [h] h := sorry
+  have ee : 0 = h - h := sorry
+  exact ⟨h, h, ee, ⟨qq, ww⟩⟩
 
 end Notes

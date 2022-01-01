@@ -4,21 +4,34 @@
   Authors: Arthur Paulino
 -/
 
-import LeanMusic.Intervals
 import LeanMusic.Notes
+import LeanMusic.Intervals
 
-/--
-A scale shape is a list of intervals such that:
-* There can't be more than 11 intervals in it
-* The intervals must be in ascending order
-* The maximal range of its relative intervals can't be greater than an octave
--/
 structure ScaleShape where
   intervals      : Intervals
   startsPositive : intervals.startsPositive := by simp
   ascending      : intervals.ascending := by simp
   properMax      : intervals.max ascending < 12 := by simp
 
+def oneTwoThree : ScaleShape :=
+  ScaleShape.mk [1, 2, 3]
+    (by simp [Intervals.startsPositive])
+    (by simp [Intervals.max, Intervals.ascending])
+
 structure Scale where
   base  : Int
   shape : ScaleShape
+
+def asd : Scale := ⟨0, oneTwoThree⟩
+
+/--
+A scale with `n` different pitches is a list of notes (type `Notes`) such that:
+* The notes ascend
+* `n` is the max interval between any pair of notes
+-/
+structure Scale' (n : Nat := 0) where
+  notes       : Notes
+  ascending   : notes.ascending := by simp
+  maxInterval : notes.isMaxIntervalBound (Int.ofNat n) := by simp
+
+-- def singletonScale (n : Int) : Scale' 1 := Scale'.mk [n]
