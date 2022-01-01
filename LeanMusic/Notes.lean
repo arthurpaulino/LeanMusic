@@ -24,12 +24,12 @@ def last (l : Notes) (he : l ≠ []) : Int :=
 -- Transformations
 
 def shiftedOf : Notes → Int → Notes
-  | h::t, i => [h + i] ++ shiftedOf t i
-  | _, _    => []
+  | h :: t, i => [h + i] ++ shiftedOf t i
+  | _,      _ => []
 
 def invertedAt : Notes → Int → Notes
-  | h::t, a => t ++ [a + h]
-  | _, _    => []
+  | h :: t, a => t ++ [a + h]
+  | _,      _ => []
 
 def invertedAtTimes : Notes → Int → Nat → Notes
   | l, _, Nat.zero   => l
@@ -38,8 +38,8 @@ def invertedAtTimes : Notes → Int → Nat → Notes
 -- Properties
 
 def ascending : Notes → Prop
-  | h::h'::t => h < h' ∧ ascending (h'::t)
-  | _        => True
+  | h :: h' :: t => h < h' ∧ ascending (h' :: t)
+  | _            => True
 
 def isHighest (l : Notes) (n : Int) : Prop :=
   l.contains n ∧ ∀ n', l.contains n' → n' ≤ n
@@ -61,8 +61,8 @@ def ofSameIntervalsIfInvertedAt (l l' : Notes) (a : Int) : Prop :=
 -- Notes ↔ Intervals
 
 def toIntervals : ∀ (l : Notes), l ≠ [] → List Int
-  | [],           hne => absurd rfl hne
-  | h::(t : Notes), _ => t.shiftedOf (-h)
+  | [],             hne => absurd rfl hne
+  | h :: (t : Notes), _ => t.shiftedOf (-h)
 
 def ofIntervals : Int → List Int → Notes
   | h,          [] => [h]
@@ -85,30 +85,30 @@ theorem sameLengthOfInverted (n : Int) :
     | cons _ _ => simp [invertedAt]
 
 theorem shiftOfHeadAndTail (h : Int) (of : Int) (t : Notes) :
-    shiftedOf (h::t) of = (h + of)::(shiftedOf t of) := rfl
+    shiftedOf (h :: t) of = (h + of) :: (shiftedOf t of) := rfl
 
 theorem ascendingTailOfAscending (ha : l.ascending) :
     l.tail.ascending := by
   cases l with
     | cons _ t =>
       match t with
-      | [] => simp [ascending]
-      | _::_ => simp only [tail, List.tailD, ha.2]
+      | []     => simp [ascending]
+      | _ :: _ => simp only [tail, List.tailD, ha.2]
     | _ => simp [ascending]
 
 theorem ascendingOfShifted (ha : l.ascending) (of : Int) :
     (l.shiftedOf of).ascending := by
   induction l with
-    | nil => simp [ascending]
+    | nil         => simp [ascending]
     | cons _ t hi =>
       match t with
-        | [] => simp [ascending]
-        | th::tt =>
+        | []       => simp [ascending]
+        | th :: tt =>
           simp [shiftedOf] at ha hi
           simp [ascending, List.append, Int.ltOfPlus ha.1, hi ha.2]
 
 theorem ascendingOfLtAndAscending {h h' : Int} {t : Notes}
-    (ha : h' < h ∧ ascending (h::t)) : ascending (h'::t) := sorry
+    (ha : h' < h ∧ ascending (h :: t)) : ascending (h' :: t) := sorry
 
 theorem firstIsLowestOfAscending (ha : l.ascending) (hne : l ≠ []) :
     l.isLowest (l.first hne) := by
