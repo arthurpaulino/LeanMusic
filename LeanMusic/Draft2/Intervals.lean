@@ -8,6 +8,9 @@ abbrev IntervalsSeq := List Int
 
 namespace IntervalsSeq
 
+@[simp] def tail (s : IntervalsSeq) : IntervalsSeq :=
+  s.tailD []
+
 @[simp] def allPositive : IntervalsSeq → Prop
   | h :: t => h > 0 ∧ allPositive t
   | _      => True
@@ -20,9 +23,18 @@ namespace IntervalsSeq
 --   | h::t, of => [h + of] ++ shiftedOf t of
 --   | _,    _  => []
 
--- def invertAt : IntervalsSeq → Interval → IntervalsSeq
---   | h :: (t : IntervalsSeq), a => t ++ [a - t.sum]
---   | _,                       _ => []
+def invertAt : IntervalsSeq → Int → IntervalsSeq
+  | h :: (t : IntervalsSeq), a => t ++ [a - t.delta]
+  | _,                       _ => []
+
+theorem allPositiveTailOfAllPositive (s : IntervalsSeq)
+    (hp : s.allPositive) : allPositive s.tail := sorry
+
+theorem nonNegativeDeltaOfAllPositive (s : IntervalsSeq) (hp : s.allPositive) :
+    s.delta ≥ 0 := by
+  induction s with
+    | nil => simp
+    | cons h t hi => sorry
 
 end IntervalsSeq
 
