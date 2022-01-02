@@ -4,15 +4,17 @@
   Authors: Arthur Paulino
 -/
 
+import LeanMusic.Draft2.Utils
+
 abbrev IntervalsSeq := List Int
 
 namespace IntervalsSeq
 
-@[simp] def tail (s : IntervalsSeq) : IntervalsSeq :=
-  s.tailD []
+-- def tail (s : IntervalsSeq) : IntervalsSeq :=
+--   s.tailD []
 
-@[simp] def allPositive : IntervalsSeq → Prop
-  | h :: t => h > 0 ∧ allPositive t
+@[simp] def notLeZero : IntervalsSeq → Prop
+  | h :: t => 0 < h ∧ notLeZero t
   | _      => True
 
 @[simp] def delta : IntervalsSeq → Int
@@ -23,30 +25,46 @@ namespace IntervalsSeq
 --   | h::t, of => [h + of] ++ shiftedOf t of
 --   | _,    _  => []
 
-def invertAt : IntervalsSeq → Int → IntervalsSeq
+def invertedAt : IntervalsSeq → Int → IntervalsSeq
   | h :: (t : IntervalsSeq), a => t ++ [a - t.delta]
   | _,                       _ => []
 
-theorem allPositiveTailOfAllPositive (s : IntervalsSeq)
-    (hp : s.allPositive) : allPositive s.tail := sorry
+theorem allPositiveTailOfAllPositive (h : Int) (t : IntervalsSeq)
+    (hp : notLeZero (h :: t)) : h > 0 ∧ notLeZero t := by
+  cases t with
+    | nil      => simp [hp.1]
+    | cons _ _ => exact hp
 
-theorem nonNegativeDeltaOfAllPositive (s : IntervalsSeq) (hp : s.allPositive) :
+theorem nonNegativeDeltaOfAllPositive (s : IntervalsSeq) (hp : s.notLeZero) :
     s.delta ≥ 0 := by
   induction s with
-    | nil => simp
-    | cons h t hi => sorry
+    | nil         => simp
+    | cons h t hi =>
+      have hpt := allPositiveTailOfAllPositive h t hp
+      exact Int.sumGeOfGtGe h (delta t) hpt.1 (hi hpt.2)
 
 end IntervalsSeq
 
-structure ChordShape (n : Nat) where
+structure ScaleShape (n : Nat) where
   intervalsSeq : IntervalsSeq
-  allPositive  : intervalsSeq.allPositive := by simp
-
-structure ScaleShape (n : Nat) extends ChordShape n where
+  allPositive  : intervalsSeq.notLeZero           := by simp
   boundedDelta : intervalsSeq.delta < Int.ofNat n := by simp
 
-structure Chord (n : Nat) extends ChordShape n where
+variable (n : Nat) (s : IntervalsSeq)
+  (hp : s.notLeZero           := by simp)
+  (hd : s.delta < Int.ofNat n := by simp)
+
+namespace ScaleShape
+
+def new : ScaleShape n := ⟨s, hp, hd⟩
+
+end ScaleShape
+
+structure Scale (n : Nat) extends ScaleShape n where
   base : Int
 
-structure Scale (n : Nat) extends ScaleShape n, Chord n
+namespace Scale
 
+def new (base : Int) : Scale n := ⟨⟨s, hp, hd⟩, base⟩
+
+end Scale
