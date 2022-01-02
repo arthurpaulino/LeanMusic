@@ -4,7 +4,7 @@
   Authors: Arthur Paulino
 -/
 
-import LeanMusic.Utils
+import LeanMusic.Draft1.Utils
 
 /-- Semi-*int*ervals are represented with the type `Int` (happy coincidence). -/
 abbrev Intervals := List Int
@@ -16,15 +16,15 @@ def tail (l : Intervals) : Intervals :=
 
 -- Characterizations
 
-def ascending : Intervals → Prop
+@[simp] def ascending : Intervals → Prop
   | h::h'::t => h < h' ∧ ascending (h'::t)
   | _        => True
 
-def startsPositive : Intervals → Prop
+@[simp] def startsPositive : Intervals → Prop
   | h::_ => h > 0
   | _    => True
 
-def max (l : Intervals) (ha : l.ascending := by simp) : Int :=
+@[simp] def max (l : Intervals) (ha : l.ascending := by simp) : Int :=
   l.getLastD 0
 
 def shiftedOf : Intervals → Int → Intervals
@@ -54,20 +54,20 @@ theorem ascendingTailOfAscending (l : Intervals) (ha : l.ascending) :
   cases l with
     | cons _ t =>
       match t with
-      | [] => simp [ascending]
+      | [] => simp
       | _::_ => simp only [tail, List.tailD, ha.2]
-    | _ => simp [ascending]
+    | _ => simp
 
 theorem ascendingOfShifted (l : Intervals) (ha : l.ascending) (of : Int) :
     (l.shiftedOf of).ascending := by
   induction l with
-    | nil => simp [ascending]
+    | nil => simp
     | cons _ t hi =>
       match t with
-        | [] => simp [ascending]
+        | [] => simp
         | th::tt =>
           simp [shiftedOf] at ha hi
-          simp [ascending, List.append, Int.ltOfPlus ha.1, hi ha.2]
+          simp [List.append, Int.ltOfPlus ha.1, hi ha.2]
 
 -- Known intervals
 

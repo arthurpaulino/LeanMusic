@@ -4,7 +4,5 @@
   Authors: Arthur Paulino
 -/
 
-import LeanMusic.Intervals
-
 def main : IO Unit :=
   IO.println s!"Hello!"

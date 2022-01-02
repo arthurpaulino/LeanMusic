@@ -4,7 +4,7 @@
   Authors: Arthur Paulino
 -/
 
-import LeanMusic.Utils
+import LeanMusic.Draft1.Utils
 
 abbrev Notes := List Int
 

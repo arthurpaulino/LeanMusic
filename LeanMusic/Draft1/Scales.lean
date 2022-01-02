@@ -4,8 +4,8 @@
   Authors: Arthur Paulino
 -/
 
-import LeanMusic.Notes
-import LeanMusic.Intervals
+import LeanMusic.Draft1.Notes
+import LeanMusic.Draft1.Intervals
 
 structure ScaleShape where
   intervals      : Intervals
@@ -14,9 +14,7 @@ structure ScaleShape where
   properMax      : intervals.max ascending < 12 := by simp
 
 def oneTwoThree : ScaleShape :=
-  ScaleShape.mk [1, 2, 3]
-    (by simp [Intervals.startsPositive])
-    (by simp [Intervals.max, Intervals.ascending])
+  ScaleShape.mk [1, 2, 3, 6, 10]
 
 structure Scale where
   base  : Int
