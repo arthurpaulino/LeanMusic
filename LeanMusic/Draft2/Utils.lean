@@ -4,5 +4,7 @@
   Authors: Arthur Paulino
 -/
 
-theorem Int.sumGeOfGtGe (a b : Int) (ha : 0 < a) (hb : 0 ≤  b) :
+theorem Int.sumGeOfGtGe (a b : Int) (ha : 0 < a) (hb : 0 ≤ b) :
     a + b ≥ 0 := sorry
+
+theorem Int.qq (a b : Int) (h : a < b) : 0 < b - a := sorry
