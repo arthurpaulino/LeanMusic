@@ -4,13 +4,10 @@
   Authors: Arthur Paulino
 -/
 
-theorem Int.sumGeOfGtGe (a b : Int) (ha : 0 < a) (hb : 0 ≤ b) :
-    a + b ≥ 0 := sorry
+theorem And.trivialRight (h : a) : a ∧ True := by
+  simp only [and_true]
+  exact h
 
 theorem Int.zeroLtSubOfLt (a b : Int) (h : a < b) : 0 < b - a := sorry
 
-theorem Int.ltOfZeroLtAndSumLt (a b c : Int) (ha : 0 < a) (h : a + b < c) :
-    b < c := sorry
-
-@[simp] theorem List.eqOfAppendEmpty (l : List α) :
-    l.append [] = l := sorry
+theorem Int.what (a b c : Int) (h : 0 < c) : a + (b - (c + a) + 0) < b := sorry
