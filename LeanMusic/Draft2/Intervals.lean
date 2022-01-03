@@ -44,6 +44,9 @@ theorem posInvOfPosAndBound (s : IntervalsSeq) (i : Int)
           (Int.ltOfZeroLtAndSumLt h (delta t) i hp.1 hb)]
       exact posOfAppendPos t iSubDelta hp.2 hpid
 
+theorem deltaSumEqSumDeltas (s s' : IntervalsSeq) :
+    delta (s ++ s') = delta s + delta s' := sorry
+
 theorem boundInvOfPosAndBound (s : IntervalsSeq) (i : Int)
     (hp : s.allPositive) (hb : s.delta < i) :
       (s.invertedAt i).delta < i := by
@@ -52,7 +55,8 @@ theorem boundInvOfPosAndBound (s : IntervalsSeq) (i : Int)
     | cons h t hi =>
       have hi' := hi hp.2
         (Int.ltOfZeroLtAndSumLt h (delta t) i hp.1 hb)
-      simp [invertedAt]
+      simp [invertedAt, deltaSumEqSumDeltas]
+      -- false?!
       sorry
 
 end IntervalsSeq

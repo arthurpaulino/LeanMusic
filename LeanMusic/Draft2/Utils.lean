@@ -13,4 +13,4 @@ theorem Int.ltOfZeroLtAndSumLt (a b c : Int) (ha : 0 < a) (h : a + b < c) :
     b < c := sorry
 
 @[simp] theorem List.eqOfAppendEmpty (l : List α) :
-    List.append l [] = l := sorry
+    l.append [] = l := sorry
