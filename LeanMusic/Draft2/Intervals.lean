@@ -29,9 +29,6 @@ theorem nonNegDeltaOfPos (s : IntervalsSeq) (hp : s.allPositive) :
     | cons h t hi =>
       exact Int.sumGeOfGtGe h (delta t) (hp.1) (hi hp.2)
 
-theorem boundTailOfPosHeadAndBound (h i : Int) (t : IntervalsSeq)
-    (hp : 0 < h) (hb : delta (h :: t) < i) : delta t < i := sorry
-
 theorem posOfAppendPos (s s' : IntervalsSeq)
     (hps : s.allPositive) (hps' : s'.allPositive) :
     (s ++ s').allPositive := sorry
@@ -39,15 +36,24 @@ theorem posOfAppendPos (s s' : IntervalsSeq)
 theorem posInvOfPosAndBound (s : IntervalsSeq) (i : Int)
     (hp : s.allPositive) (hb : s.delta < i) : (s.invertedAt i).allPositive := by
   cases s with
-  | nil      => simp
-  | cons h t =>
-    have hbt := boundTailOfPosHeadAndBound h i t hp.1 hb
-    have hpid : allPositive [(i - (delta t))] := by
-      simp [Int.qq (delta t) i hbt]
-    exact posOfAppendPos t [(i - (delta t))] hp.2 hpid
+    | nil      => simp
+    | cons h t =>
+      let iSubDelta := [(i - (delta t))]
+      have hpid : allPositive iSubDelta := by
+        simp [Int.zeroLtSubOfLt (delta t) i
+          (Int.ltOfZeroLtAndSumLt h (delta t) i hp.1 hb)]
+      exact posOfAppendPos t iSubDelta hp.2 hpid
 
 theorem boundInvOfPosAndBound (s : IntervalsSeq) (i : Int)
-    (hp : s.allPositive) (hb : s.delta < i) : (s.invertedAt i).delta < i := sorry
+    (hp : s.allPositive) (hb : s.delta < i) :
+      (s.invertedAt i).delta < i := by
+  induction s with
+    | nil => exact hb
+    | cons h t hi =>
+      have hi' := hi hp.2
+        (Int.ltOfZeroLtAndSumLt h (delta t) i hp.1 hb)
+      simp [invertedAt]
+      sorry
 
 end IntervalsSeq
 

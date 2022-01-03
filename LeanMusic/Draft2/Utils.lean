@@ -7,4 +7,10 @@
 theorem Int.sumGeOfGtGe (a b : Int) (ha : 0 < a) (hb : 0 ≤ b) :
     a + b ≥ 0 := sorry
 
-theorem Int.qq (a b : Int) (h : a < b) : 0 < b - a := sorry
+theorem Int.zeroLtSubOfLt (a b : Int) (h : a < b) : 0 < b - a := sorry
+
+theorem Int.ltOfZeroLtAndSumLt (a b c : Int) (ha : 0 < a) (h : a + b < c) :
+    b < c := sorry
+
+@[simp] theorem List.eqOfAppendEmpty (l : List α) :
+    List.append l [] = l := sorry
